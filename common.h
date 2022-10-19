@@ -65,7 +65,7 @@ struct logger_s
     int ref;
     FILE *file;
     int level;
-    close_file_fn on_close;
+    close_file_fn close_fn;
     int color;
     void *mutex;
 };

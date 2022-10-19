@@ -97,6 +97,19 @@ done:
     return 0;
 }
 
+void config_iterate_devices(config_t config, device_iterator_fn device_fn, void * user_data)
+{
+    assert(config != NULL);
+    assert(device_fn != NULL);
+    int index;
+    device_t device;
+    for(index = 0; index < config->ndevices; index++)
+    {
+        device = (config->devices + index);
+        device_fn(device,user_data);
+    }
+}
+
 void config_ref(config_t config)
 {
     config->ref++;

@@ -2,7 +2,7 @@
 #define LOGGER_H
 #include "common.h"
 
-int logger_create(logger_t *logger, int level, FILE *file, close_file_fn on_close, const char ** error);
+int logger_create(logger_t *logger, int level, FILE *file, close_file_fn close_fn, const char ** error);
 
 int logger_create_from_config(logger_t *logger, config_t config, const char ** error);
 

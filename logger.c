@@ -44,7 +44,7 @@ const char *const log_colors[] = {
 
 static void logger_destroy(logger_t logger);
 
-int logger_create(logger_t *logger, int level, FILE *file, close_file_fn on_close, const char **error)
+int logger_create(logger_t *logger, int level, FILE *file, close_file_fn close_fn, const char **error)
 {
     int status;
     logger_t new_logger;
@@ -67,7 +67,7 @@ int logger_create(logger_t *logger, int level, FILE *file, close_file_fn on_clos
     new_logger->ref = 1;
     new_logger->level = level;
     new_logger->file = file;
-    new_logger->on_close = on_close;
+    new_logger->close_fn = close_fn;
     new_logger->mutex = new_mutex;
 
     *logger = new_logger;
@@ -102,6 +102,7 @@ int logger_create_from_config(logger_t *logger, config_t config, const char **er
     IF_THROW(new_mutex == NULL, "logger_create: failed to allocate mutex")
     IF_THROW(pthread_mutex_init(new_mutex, NULL) != 0, "logger_create: failed to initialize mutex")
 
+    new_logger->color = 1;
     if (strcmp(config->log_path, "stdout") == 0)
     {
         new_file = stdout;
@@ -114,13 +115,18 @@ int logger_create_from_config(logger_t *logger, config_t config, const char **er
     }
     else
     {
+        new_logger->color = 0;
         new_file = fopen(config->log_path, "a");
         new_close_fn = fclose;
     }
+
     IF_THROW(new_file == NULL, "logger_create: null file")
 
+    new_logger->ref = 1;
     new_logger->file = new_file;
-    new_logger->on_close = new_close_fn;
+    new_logger->close_fn = new_close_fn;
+    new_logger->level = config->log_level;
+    new_logger->mutex = new_mutex;
 
     *logger = new_logger;
 
@@ -223,9 +229,9 @@ void logger_destroy(logger_t logger)
             free(logger->mutex);
         }
 
-        if (logger->on_close != NULL && logger->file != NULL)
+        if (logger->close_fn != NULL && logger->file != NULL)
         {
-            logger->on_close(logger->file);
+            logger->close_fn(logger->file);
         }
         free(logger);
     }

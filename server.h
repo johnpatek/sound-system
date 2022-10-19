@@ -9,7 +9,7 @@ struct server_s
     int ref;
     config_t config;
     logger_t logger;
-    void *private;
+    void *internal;
 };
 
 typedef struct server_s* server_t;
