@@ -1,0 +1,17 @@
+{
+    "port": "12345",
+    "log": {
+        "path": "stdout",
+        "level": "trace"
+    },
+    "devices": [
+        {
+            "name": "alsa_output.usb-KTMicro_KT_USB_Audio_2020-02-20-0000-0000-0000--00.analog-stereo",
+            "endpoint": "left"
+        },
+        {
+            "name": "alsa_output.usb-KTMicro_KT_USB_Audio_2021-06-07-0000-0000-0000--00.analog-stereo",
+            "endpoint": "right"
+        }
+    ]
+}

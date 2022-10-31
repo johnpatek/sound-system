@@ -2,9 +2,20 @@
 #define LOGGER_H
 #include "common.h"
 
-int logger_create(logger_t *logger, int level, FILE *file, close_file_fn close_fn, const char ** error);
+typedef int (*close_file_fn)(FILE *);
 
-int logger_create_from_config(logger_t *logger, config_t config, const char ** error);
+struct logger_s
+{
+    int ref;
+    FILE *file;
+    int level;
+    close_file_fn close_fn;
+    int color;
+    void *mutex;
+};
+typedef struct logger_s *logger_t;
+
+int logger_create(logger_t *logger, int level, FILE *file, close_file_fn close_fn, const char ** error);
 
 void logger_ref(logger_t logger);
 

@@ -15,14 +15,37 @@ find_path(
     /usr/lib/x86_64-linux-gnu/glib-2.0/include
     /usr/lib/arm-linux-gnueabihf/glib-2.0/include)
 
+set(LOGGER_INCLUDE src/include/logger)
 
-add_executable(server main.c server.c config.c logger.c)
+set(A2DP_INCLUDE src/include/a2dp)
 
-target_include_directories(
-    server 
-    PRIVATE 
-    ${GLIB_INCLUDE} 
-    ${GLIB_CONFIG_INCLUDE} 
-    ${GSTREAMER_INCLUDE})
 
-target_link_libraries(server cjson glib-2.0 gstrtspserver-1.0 gobject-2.0 pthread)
+option(CLIENT "build sound system client")
+option(SERVER "build sound system server")
+
+add_library(logger SHARED src/logger/logger.c)
+target_include_directories(logger PRIVATE ${LOGGER_INCLUDE})
+
+if(${SERVER})
+    add_executable(server src/server/main.c src/server/config.c src/server/config.h src/server/server.c src/server/server.h)
+    target_include_directories(
+        server 
+        PRIVATE 
+        ${LOGGER_INCLUDE}
+        ${GLIB_INCLUDE} 
+        ${GLIB_CONFIG_INCLUDE} 
+        ${GSTREAMER_INCLUDE})
+    target_link_libraries(server cjson logger glib-2.0 gstrtspserver-1.0 gstreamer-1.0 gobject-2.0 pthread)
+endif()
+
+if(${CLIENT})
+    add_executable(client src/client/main.c)
+    target_include_directories(
+        client
+        PRIVATE 
+        ${LOGGER_INCLUDE}
+        ${GLIB_INCLUDE} 
+        ${GLIB_CONFIG_INCLUDE} 
+        ${GSTREAMER_INCLUDE})
+    target_link_libraries(client cjson logger glib-2.0 gobject-2.0 gio-2.0 pthread)
+endif()

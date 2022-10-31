@@ -2,6 +2,25 @@
 #define CONFIG_H
 #include "common.h"
 
+struct device_s
+{
+    const char *name;
+    const char *endpoint;
+};
+typedef struct device_s *device_t;
+
+struct config_s
+{
+    int ref;
+    char *port;
+    char *log_path;
+    int log_level;
+    device_t devices;
+    int ndevices;
+    void *json;
+};
+typedef struct config_s *config_t;
+
 typedef void (*device_iterator_fn)(device_t, void*);
 
 int config_create(config_t *config, const char ** error);

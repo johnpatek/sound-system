@@ -113,10 +113,10 @@ void server_deploy(server_t server)
     mount_device_user_data->mount_points = mount_points;
 
     config_iterate_devices(server->config, server_mount_device, mount_device_user_data);
-    if(mount_device_user_data->has_error)
+    if (mount_device_user_data->has_error)
     {
         ERRORLN("server_deploy: failed to mount device(s)")
-        goto error;    
+        goto error;
     }
     free(mount_device_user_data);
     g_object_unref(mount_points);
@@ -159,15 +159,17 @@ void server_mount_device(device_t device, void *user_data)
 
     mount_device_user_data = (mount_device_user_data_t)user_data;
     server = mount_device_user_data->server;
-
-    launch_string = g_strdup_printf("( rtpmpadepay name=depay%d ! mpg123audiodec ! audioconvert ! fakesink )", mount_device_user_data->index);
+    
+    launch_string = g_strdup_printf("( decodebin name=depay0 ! pulsesink device=%s )", device->name);
     endpoint_string = g_strdup_printf("/%s", device->endpoint);
 
     factory = gst_rtsp_media_factory_new();
     gst_rtsp_media_factory_set_transport_mode(factory, GST_RTSP_TRANSPORT_MODE_RECORD);
     gst_rtsp_media_factory_set_launch(factory, launch_string);
+    gst_rtsp_media_factory_set_latency(factory,500);
     gst_rtsp_mount_points_add_factory(mount_device_user_data->mount_points, endpoint_string, factory);
-
+    INFOF("mounted device \"%s\" at endpoint %s\n", device->name, endpoint_string)
+    DEBUGF("launch string: %s\n", launch_string)
     g_free(launch_string);
     g_free(endpoint_string);
     mount_device_user_data->index++;
