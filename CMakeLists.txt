@@ -46,6 +46,8 @@ if(${CLIENT})
         ${LOGGER_INCLUDE}
         ${GLIB_INCLUDE} 
         ${GLIB_CONFIG_INCLUDE} 
-        ${GSTREAMER_INCLUDE})
-    target_link_libraries(client cjson logger glib-2.0 gobject-2.0 gio-2.0 pthread)
+        ${GSTREAMER_INCLUDE}
+        "/usr/include/dbus-1.0"
+        "/usr/lib/arm-linux-gnueabihf/dbus-1.0/include")
+    target_link_libraries(client dbus-1 cjson logger glib-2.0 gobject-2.0 gio-2.0 pthread)
 endif()
